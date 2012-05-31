@@ -79,6 +79,7 @@ $.extend(Microfiche.prototype, {
     cyclic          : false,
     keyboard        : false,
     clickToAdvance  : false,
+    scrollwheel     : false,
     minDuration     : 250,
     duration        : 500,
     maxDuration     : 500,
@@ -112,6 +113,7 @@ $.extend(Microfiche.prototype, {
     this.enableTouch();
     this.enableKeyboard();
     this.enableClick();
+    this.enableScroll();
     this.prepareCyclic();
 
     this.run(this.options);
@@ -247,6 +249,27 @@ $.extend(Microfiche.prototype, {
     this.film.on('mousedown', this.onmousedown);
   },
 
+  // Add in moushweel event.
+  enableScroll: function() {
+    if (!this.options.scrollwheel) return;
+
+    var self = this;
+
+    var thisOnmousewheel = this.onmousewheel;
+    this.onmousewheel = function() { thisOnmousewheel.apply(self, arguments) };
+    
+    $(document).on('mousewheel', function(e){
+      if (self.el.find(e.srcElement).length < 1 || self.windowScrolling) {
+        clearTimeout(self.windowScrolling);
+        self.windowScrolling = setTimeout(function(){ delete self.windowScrolling; }, 250);
+      } else {
+        self.onmousewheel(e);
+        e.preventDefault();
+      }
+    });
+
+  },
+
 
   // ## User Event Handling ##
 
@@ -369,6 +392,23 @@ $.extend(Microfiche.prototype, {
   // Advance microfiche on mousedown.
   onmousedown: function(e) {
     this.slideByPages(1);
+  },
+
+  // Slide left or right on scrollwheel.
+  onmousewheel: function(e) {
+    var self = this;
+    
+    var delta = e.originalEvent.wheelDelta;
+    if (Math.abs(delta) > 10) {
+      if (this.scrollWait) return;
+      if (e.originalEvent.wheelDeltaX) delta *= -1;
+      this.slideByPages( delta/Math.abs(delta) );
+      this.scrollWait = setTimeout(function(){
+        clearTimeout(self.scrollWait);
+        delete self.scrollWait;
+      }, 250);
+    }
+
   },
 
   // ## State Update ##
