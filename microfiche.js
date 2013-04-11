@@ -32,6 +32,12 @@
 //
 //     $('.my-slideshow').microfiche({ bullets: false });
 //
+// ## controls
+//
+// jQuery object to append controls to
+//
+//   eg. $('.my-slideshow').microfiche({ controls: jQuery('#controlsContainer') });
+// 
 // ## Commands
 //
 // The following commands can be run on a microfiche'd element at any point,
@@ -68,7 +74,7 @@
 //     $('.my-slideshow').microfiche({ autoplay: n });
 //
 
-(function() {
+(function($) {
 
 window.Microfiche = function(options) { this.initialize(options); return this; };
 
@@ -94,7 +100,8 @@ $.extend(Microfiche.prototype, {
     elasticity      : 0.5,
     swipeThreshold  : 0.125,
     prevButtonLabel : '&larr;',
-    nextButtonLabel : '&rarr;'
+    nextButtonLabel : '&rarr;',
+    controls        : false
   },
 
   // Rather than relying on the literal position of `this.film`,
@@ -172,7 +179,7 @@ $.extend(Microfiche.prototype, {
   createControls: function() {
     var self = this;
 
-    this.controls = $('<span class="microfiche-controls" />').appendTo(this.el);
+    this.controls = $('<span class="microfiche-controls" />').appendTo((this.options.controls)? this.options.controls : this.el);
     this.controls.on('click', 'a, button', function(e) { self.didClickControl(e) });
 
     if (this.options.bullets) this.createBullets();
@@ -665,5 +672,5 @@ jQuery.fn.microfiche = function(options) {
   });
 }
 
-})();
+})(jQuery);
 
