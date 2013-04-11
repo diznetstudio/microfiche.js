@@ -138,7 +138,7 @@ $.extend(Microfiche.prototype, {
   createFilm: function() {
     this.film = $('<div class="microfiche-film">').
     css({ position: 'absolute' });
-    this.el.children().appendTo(this.film).css({ float: 'left' });
+    this.el.children().appendTo(this.film).css({ 'float': 'left' });
     this.prepareFilm && this.prepareFilm();
   },
 
